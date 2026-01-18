@@ -1,0 +1,72 @@
+{
+  "common": {
+    "appName": "Meet365 CRM",
+    "loading": "로딩 중...",
+    "error": "오류가 발생했습니다",
+    "save": "저장",
+    "cancel": "취소",
+    "edit": "수정",
+    "delete": "삭제",
+    "back": "뒤로",
+    "search": "검색",
+    "filter": "필터",
+    "all": "전체",
+    "noData": "데이터가 없습니다"
+  },
+  "auth": {
+    "login": "로그인",
+    "logout": "로그아웃",
+    "loginWithGoogle": "Google로 로그인",
+    "loginDescription": "meet365.net 계정으로 로그인하세요",
+    "domainError": "meet365.net 도메인 계정만 로그인할 수 있습니다"
+  },
+  "customer": {
+    "title": "고객 목록",
+    "detail": "고객 상세",
+    "info": "기본 정보",
+    "code": "코드",
+    "type": "유형",
+    "grade": "등급",
+    "status": "상태",
+    "contacts": "연락처",
+    "lastCall": "마지막 통화",
+    "daysAgo": "{days}일 전",
+    "weeksAgo": "{weeks}주 전",
+    "businessTypes": {
+      "restaurant": "레스토랑",
+      "hotel": "호텔",
+      "catering": "케이터링",
+      "retail": "소매"
+    },
+    "statuses": {
+      "active": "활성",
+      "inactive": "비활성",
+      "pending": "대기"
+    },
+    "grades": {
+      "A": "A등급",
+      "B": "B등급",
+      "C": "C등급"
+    }
+  },
+  "contact": {
+    "primary": "대표",
+    "ordering": "주문 담당",
+    "accounting": "회계 담당",
+    "call": "전화",
+    "line": "라인"
+  },
+  "activity": {
+    "title": "최근 활동",
+    "addMemo": "메모 추가",
+    "callMemo": "통화 메모",
+    "duration": "통화 시간 (분)",
+    "memo": "메모",
+    "types": {
+      "call": "통화",
+      "visit": "방문",
+      "email": "이메일",
+      "note": "메모"
+    }
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "common": {
+    "appName": "Meet365 CRM",
+    "loading": "กำลังโหลด...",
+    "error": "เกิดข้อผิดพลาด",
+    "save": "บันทึก",
+    "cancel": "ยกเลิก",
+    "edit": "แก้ไข",
+    "delete": "ลบ",
+    "back": "กลับ",
+    "search": "ค้นหา",
+    "filter": "กรอง",
+    "all": "ทั้งหมด",
+    "noData": "ไม่มีข้อมูล"
+  },
+  "auth": {
+    "login": "เข้าสู่ระบบ",
+    "logout": "ออกจากระบบ",
+    "loginWithGoogle": "เข้าสู่ระบบด้วย Google",
+    "loginDescription": "เข้าสู่ระบบด้วยบัญชี meet365.net",
+    "domainError": "เฉพาะบัญชี meet365.net เท่านั้นที่สามารถเข้าสู่ระบบได้"
+  },
+  "customer": {
+    "title": "รายการลูกค้า",
+    "detail": "รายละเอียดลูกค้า",
+    "info": "ข้อมูลพื้นฐาน",
+    "code": "รหัส",
+    "type": "ประเภท",
+    "grade": "เกรด",
+    "status": "สถานะ",
+    "contacts": "ผู้ติดต่อ",
+    "lastCall": "โทรล่าสุด",
+    "daysAgo": "{days} วันที่แล้ว",
+    "weeksAgo": "{weeks} สัปดาห์ที่แล้ว",
+    "businessTypes": {
+      "restaurant": "ร้านอาหาร",
+      "hotel": "โรงแรม",
+      "catering": "จัดเลี้ยง",
+      "retail": "ค้าปลีก"
+    },
+    "statuses": {
+      "active": "ใช้งาน",
+      "inactive": "ไม่ใช้งาน",
+      "pending": "รอดำเนินการ"
+    },
+    "grades": {
+      "A": "เกรด A",
+      "B": "เกรด B",
+      "C": "เกรด C"
+    }
+  },
+  "contact": {
+    "primary": "หลัก",
+    "ordering": "ฝ่ายสั่งซื้อ",
+    "accounting": "ฝ่ายบัญชี",
+    "call": "โทร",
+    "line": "ไลน์"
+  },
+  "activity": {
+    "title": "กิจกรรมล่าสุด",
+    "addMemo": "เพิ่มบันทึก",
+    "callMemo": "บันทึกการโทร",
+    "duration": "ระยะเวลาโทร (นาที)",
+    "memo": "บันทึก",
+    "types": {
+      "call": "โทร",
+      "visit": "เยี่ยมชม",
+      "email": "อีเมล",
+      "note": "บันทึก"
+    }
+  }
+}

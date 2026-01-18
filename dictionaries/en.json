@@ -1,0 +1,72 @@
+{
+  "common": {
+    "appName": "Meet365 CRM",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "back": "Back",
+    "search": "Search",
+    "filter": "Filter",
+    "all": "All",
+    "noData": "No data"
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "loginWithGoogle": "Login with Google",
+    "loginDescription": "Sign in with your meet365.net account",
+    "domainError": "Only meet365.net accounts can sign in"
+  },
+  "customer": {
+    "title": "Customer List",
+    "detail": "Customer Detail",
+    "info": "Basic Info",
+    "code": "Code",
+    "type": "Type",
+    "grade": "Grade",
+    "status": "Status",
+    "contacts": "Contacts",
+    "lastCall": "Last call",
+    "daysAgo": "{days} days ago",
+    "weeksAgo": "{weeks} weeks ago",
+    "businessTypes": {
+      "restaurant": "Restaurant",
+      "hotel": "Hotel",
+      "catering": "Catering",
+      "retail": "Retail"
+    },
+    "statuses": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "pending": "Pending"
+    },
+    "grades": {
+      "A": "Grade A",
+      "B": "Grade B",
+      "C": "Grade C"
+    }
+  },
+  "contact": {
+    "primary": "Primary",
+    "ordering": "Ordering",
+    "accounting": "Accounting",
+    "call": "Call",
+    "line": "Line"
+  },
+  "activity": {
+    "title": "Recent Activities",
+    "addMemo": "Add Memo",
+    "callMemo": "Call Memo",
+    "duration": "Call Duration (min)",
+    "memo": "Memo",
+    "types": {
+      "call": "Call",
+      "visit": "Visit",
+      "email": "Email",
+      "note": "Note"
+    }
+  }
+}

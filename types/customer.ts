@@ -1,0 +1,56 @@
+import { Timestamp } from "firebase/firestore";
+
+export type BusinessType = "restaurant" | "hotel" | "catering" | "retail";
+export type CustomerStatus = "active" | "inactive" | "pending";
+export type CustomerGrade = "A" | "B" | "C";
+export type ActivityType = "call" | "visit" | "email" | "note";
+
+export interface LocalizedName {
+  ko: string;
+  th: string;
+  en: string;
+}
+
+export interface Contact {
+  name: string;
+  phone: string;
+  lineId?: string;
+  role: string;
+}
+
+export interface Customer {
+  customerId: string;
+  peakCode: string;
+  shortCode: string;
+  name: LocalizedName;
+  businessType: BusinessType;
+  contacts: {
+    primary: Contact;
+    ordering?: Contact;
+    accounting?: Contact;
+  };
+  status: CustomerStatus;
+  grade: CustomerGrade;
+  tags: string[];
+  note: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+  createdBy: string;
+  updatedBy: string;
+}
+
+export interface Activity {
+  id?: string;
+  customerId: string;
+  type: ActivityType;
+  phone?: string;
+  contactName?: string;
+  duration?: number;
+  memo: string;
+  createdBy: string;
+  createdAt: Timestamp;
+}
+
+// For creating new documents (without server timestamps)
+export type CustomerInput = Omit<Customer, "createdAt" | "updatedAt">;
+export type ActivityInput = Omit<Activity, "id" | "createdAt">;
