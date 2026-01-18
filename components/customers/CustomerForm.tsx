@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { Customer, BusinessType, CustomerStatus, CustomerGrade, Contact } from "@/types/customer";
+import type { Customer, BusinessType, CustomerStatus, CustomerGrade, Contact, DeliveryAddress, OperatingHours } from "@/types/customer";
 import type { Dictionary } from "@/lib/i18n";
 import { Loader2, Plus, Trash2 } from "lucide-react";
 
@@ -35,6 +35,13 @@ export interface CustomerFormData {
   grade: CustomerGrade;
   tags: string[];
   note: string;
+  // New fields
+  deliveryAddress?: DeliveryAddress;
+  lineGroupUrl?: string;
+  operatingHours?: OperatingHours;
+  preferredDeliveryTime?: string;
+  menuPhotos?: string[];
+  issues?: string;
 }
 
 const businessTypes: BusinessType[] = ["restaurant", "hotel", "catering", "retail"];
@@ -60,7 +67,16 @@ export function CustomerForm({
     grade: initialData?.grade || "B",
     tags: initialData?.tags || [],
     note: initialData?.note || "",
+    // New fields
+    deliveryAddress: initialData?.deliveryAddress || { address: "" },
+    lineGroupUrl: initialData?.lineGroupUrl || "",
+    operatingHours: initialData?.operatingHours || { open: "", close: "" },
+    preferredDeliveryTime: initialData?.preferredDeliveryTime || "",
+    menuPhotos: initialData?.menuPhotos || [],
+    issues: initialData?.issues || "",
   });
+
+  const [menuPhotoInput, setMenuPhotoInput] = useState("");
 
   const [tagInput, setTagInput] = useState("");
   const [showOrdering, setShowOrdering] = useState(!!initialData?.contacts?.ordering);
@@ -102,6 +118,23 @@ export function CustomerForm({
     setFormData((prev) => ({
       ...prev,
       tags: prev.tags.filter((t) => t !== tag),
+    }));
+  };
+
+  const addMenuPhoto = () => {
+    if (menuPhotoInput.trim() && !formData.menuPhotos?.includes(menuPhotoInput.trim())) {
+      setFormData((prev) => ({
+        ...prev,
+        menuPhotos: [...(prev.menuPhotos || []), menuPhotoInput.trim()],
+      }));
+      setMenuPhotoInput("");
+    }
+  };
+
+  const removeMenuPhoto = (url: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      menuPhotos: prev.menuPhotos?.filter((p) => p !== url),
     }));
   };
 
@@ -369,6 +402,150 @@ export function CustomerForm({
               <Plus className="h-4 w-4 mr-1" /> {dict.contact.accounting}
             </Button>
           )}
+        </CardContent>
+      </Card>
+
+      {/* Delivery & Location */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">📍 배송 정보</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label>배송지 주소</Label>
+            <Input
+              value={formData.deliveryAddress?.address || ""}
+              onChange={(e) => setFormData((prev) => ({
+                ...prev,
+                deliveryAddress: { ...prev.deliveryAddress, address: e.target.value },
+              }))}
+              placeholder="123 Sukhumvit Road, Bangkok"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>구글맵 링크</Label>
+            <Input
+              value={formData.deliveryAddress?.googleMapsUrl || ""}
+              onChange={(e) => setFormData((prev) => ({
+                ...prev,
+                deliveryAddress: { ...prev.deliveryAddress, address: prev.deliveryAddress?.address || "", googleMapsUrl: e.target.value },
+              }))}
+              placeholder="https://maps.google.com/..."
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>선호 배송 시간</Label>
+            <Input
+              value={formData.preferredDeliveryTime || ""}
+              onChange={(e) => setFormData((prev) => ({ ...prev, preferredDeliveryTime: e.target.value }))}
+              placeholder="오전 10시 전"
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Operating Hours & Line */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">🕐 운영 정보</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>오픈 시간</Label>
+              <Input
+                type="time"
+                value={formData.operatingHours?.open || ""}
+                onChange={(e) => setFormData((prev) => ({
+                  ...prev,
+                  operatingHours: { open: e.target.value, close: prev.operatingHours?.close || "" },
+                }))}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>마감 시간</Label>
+              <Input
+                type="time"
+                value={formData.operatingHours?.close || ""}
+                onChange={(e) => setFormData((prev) => ({
+                  ...prev,
+                  operatingHours: { open: prev.operatingHours?.open || "", close: e.target.value },
+                }))}
+              />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label>라인 그룹 링크</Label>
+            <Input
+              value={formData.lineGroupUrl || ""}
+              onChange={(e) => setFormData((prev) => ({ ...prev, lineGroupUrl: e.target.value }))}
+              placeholder="https://line.me/R/ti/g/..."
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Menu Photos */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">📸 메뉴 사진</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex gap-2">
+            <Input
+              value={menuPhotoInput}
+              onChange={(e) => setMenuPhotoInput(e.target.value)}
+              placeholder="이미지 URL 입력"
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  addMenuPhoto();
+                }
+              }}
+            />
+            <Button type="button" variant="outline" onClick={addMenuPhoto}>
+              추가
+            </Button>
+          </div>
+          {formData.menuPhotos && formData.menuPhotos.length > 0 && (
+            <div className="grid grid-cols-3 gap-2">
+              {formData.menuPhotos.map((url, index) => (
+                <div key={index} className="relative group">
+                  <img
+                    src={url}
+                    alt={`Menu ${index + 1}`}
+                    className="w-full h-24 object-cover rounded-md border"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = "https://via.placeholder.com/150?text=Error";
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeMenuPhoto(url)}
+                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Issues */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">⚠️ 이슈 사항</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <textarea
+            value={formData.issues || ""}
+            onChange={(e) => setFormData((prev) => ({ ...prev, issues: e.target.value }))}
+            placeholder="주의사항, 클레임 이력, 특이사항 등..."
+            rows={3}
+            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm resize-none"
+          />
         </CardContent>
       </Card>
 

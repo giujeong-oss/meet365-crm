@@ -18,6 +18,18 @@ export interface Contact {
   role: string;
 }
 
+export interface DeliveryAddress {
+  address: string;
+  googleMapsUrl?: string;
+  lat?: number;
+  lng?: number;
+}
+
+export interface OperatingHours {
+  open: string;
+  close: string;
+}
+
 export interface Customer {
   customerId: string;
   peakCode: string;
@@ -33,6 +45,14 @@ export interface Customer {
   grade: CustomerGrade;
   tags: string[];
   note: string;
+  // New fields
+  deliveryAddress?: DeliveryAddress;
+  lineGroupUrl?: string;
+  operatingHours?: OperatingHours;
+  preferredDeliveryTime?: string;
+  menuPhotos?: string[];
+  issues?: string;
+  // Audit fields
   createdAt: Timestamp;
   updatedAt: Timestamp;
   createdBy: string;

@@ -214,6 +214,120 @@ export function CustomerDetailPage({ customerId, dict, lang }: CustomerDetailPag
                   </CardContent>
                 </Card>
 
+                {/* Delivery Info */}
+                {(customer.deliveryAddress?.address || customer.preferredDeliveryTime) && (
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base flex items-center gap-2">
+                        📍 배송 정보
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-2 text-sm">
+                      {customer.deliveryAddress?.address && (
+                        <div>
+                          <span className="text-muted-foreground">주소: </span>
+                          <span>{customer.deliveryAddress.address}</span>
+                        </div>
+                      )}
+                      {customer.deliveryAddress?.googleMapsUrl && (
+                        <div>
+                          <a
+                            href={customer.deliveryAddress.googleMapsUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 underline"
+                          >
+                            구글맵에서 보기 →
+                          </a>
+                        </div>
+                      )}
+                      {customer.preferredDeliveryTime && (
+                        <div>
+                          <span className="text-muted-foreground">선호 배송 시간: </span>
+                          <span>{customer.preferredDeliveryTime}</span>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Operating Hours & Line Group */}
+                {(customer.operatingHours?.open || customer.lineGroupUrl) && (
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base flex items-center gap-2">
+                        🕐 운영 정보
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-2 text-sm">
+                      {customer.operatingHours?.open && customer.operatingHours?.close && (
+                        <div>
+                          <span className="text-muted-foreground">운영 시간: </span>
+                          <span>{customer.operatingHours.open} - {customer.operatingHours.close}</span>
+                        </div>
+                      )}
+                      {customer.lineGroupUrl && (
+                        <div>
+                          <a
+                            href={customer.lineGroupUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-green-600 underline"
+                          >
+                            라인 그룹 열기 →
+                          </a>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Menu Photos */}
+                {customer.menuPhotos && customer.menuPhotos.length > 0 && (
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base flex items-center gap-2">
+                        📸 메뉴 사진
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-3 gap-2">
+                        {customer.menuPhotos.map((url, index) => (
+                          <a
+                            key={index}
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <img
+                              src={url}
+                              alt={`Menu ${index + 1}`}
+                              className="w-full h-24 object-cover rounded-md border hover:opacity-80 transition-opacity"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).src = "https://via.placeholder.com/150?text=Error";
+                              }}
+                            />
+                          </a>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Issues */}
+                {customer.issues && (
+                  <Card className="border-orange-200 bg-orange-50">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base flex items-center gap-2 text-orange-700">
+                        ⚠️ 이슈 사항
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-orange-800 whitespace-pre-wrap">{customer.issues}</p>
+                    </CardContent>
+                  </Card>
+                )}
+
                 {/* Activity Log */}
                 <ActivityLog
                   customerId={customerId}
