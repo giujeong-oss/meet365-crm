@@ -54,7 +54,6 @@ export function CallMemoDialog({
           contactName: contact.name,
           duration: duration ? parseInt(duration, 10) * 60 : undefined,
           memo,
-          createdBy: user.uid,
         },
         user.uid
       );

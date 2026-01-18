@@ -7,12 +7,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ContactCard } from "./ContactCard";
+import { CustomerForm, type CustomerFormData } from "./CustomerForm";
 import { ActivityLog } from "@/components/activities/ActivityLog";
 import { CallMemoDialog } from "@/components/activities/CallMemoDialog";
-import { getCustomerById } from "@/lib/firebase/customers";
+import { useAuth } from "@/contexts/AuthContext";
+import { getCustomerById, updateCustomer } from "@/lib/firebase/customers";
 import type { Customer, Contact } from "@/types/customer";
 import type { Dictionary, Locale } from "@/lib/i18n";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2, X } from "lucide-react";
 
 interface CustomerDetailPageProps {
   customerId: string;
@@ -28,39 +30,40 @@ const gradeEmojis = {
 
 export function CustomerDetailPage({ customerId, dict, lang }: CustomerDetailPageProps) {
   const router = useRouter();
+  const { user } = useAuth();
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [callMemoOpen, setCallMemoOpen] = useState(false);
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const loadCustomer = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await getCustomerById(customerId);
+      if (!data) {
+        setError(dict.common.noData);
+      } else {
+        setCustomer(data);
+      }
+    } catch {
+      setError(dict.common.error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const loadCustomer = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const data = await getCustomerById(customerId);
-        if (!data) {
-          setError(dict.common.noData);
-        } else {
-          setCustomer(data);
-        }
-      } catch {
-        setError(dict.common.error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     loadCustomer();
-  }, [customerId, dict]);
+  }, [customerId]);
 
   const handleCallClick = (contact: Contact) => {
     setSelectedContact(contact);
-    // Open phone dialer
     window.location.href = `tel:${contact.phone}`;
-    // Show memo dialog after a short delay (user returns from call)
     setTimeout(() => {
       setCallMemoOpen(true);
     }, 500);
@@ -70,6 +73,21 @@ export function CustomerDetailPage({ customerId, dict, lang }: CustomerDetailPag
     setCallMemoOpen(false);
     setSelectedContact(null);
     setRefreshKey((prev) => prev + 1);
+  };
+
+  const handleEditSubmit = async (data: CustomerFormData) => {
+    if (!user?.uid) return;
+
+    setIsSaving(true);
+    try {
+      await updateCustomer(customerId, data, user.uid);
+      await loadCustomer();
+      setIsEditing(false);
+    } catch {
+      // Error handling
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const displayName = customer?.name[lang] || customer?.name.ko || customer?.name.en || "";
@@ -84,15 +102,19 @@ export function CustomerDetailPage({ customerId, dict, lang }: CustomerDetailPag
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => router.back()}
+                onClick={() => isEditing ? setIsEditing(false) : router.back()}
               >
-                <ArrowLeft className="h-5 w-5" />
+                {isEditing ? <X className="h-5 w-5" /> : <ArrowLeft className="h-5 w-5" />}
               </Button>
-              <h1 className="font-bold text-lg truncate">{displayName}</h1>
+              <h1 className="font-bold text-lg truncate">
+                {isEditing ? "고객 수정" : displayName}
+              </h1>
             </div>
-            <Button variant="outline" size="sm">
-              {dict.common.edit}
-            </Button>
+            {!isEditing && customer && (
+              <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
+                {dict.common.edit}
+              </Button>
+            )}
           </div>
         </header>
 
@@ -105,76 +127,101 @@ export function CustomerDetailPage({ customerId, dict, lang }: CustomerDetailPag
           ) : error ? (
             <div className="text-center py-12 text-red-600">{error}</div>
           ) : customer ? (
-            <>
-              {/* Basic Info */}
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base flex items-center gap-2">
-                    📋 {dict.customer.info}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">{dict.customer.code}</span>
-                    <span>{customer.shortCode} ({customer.peakCode})</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">{dict.customer.type}</span>
-                    <span>{dict.customer.businessTypes[customer.businessType]}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">{dict.customer.grade}</span>
-                    <span>{gradeEmojis[customer.grade]} {dict.customer.grades[customer.grade]}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">{dict.customer.status}</span>
-                    <Badge variant={customer.status === "active" ? "default" : "outline"}>
-                      {dict.customer.statuses[customer.status]}
-                    </Badge>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Contacts */}
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base flex items-center gap-2">
-                    📞 {dict.customer.contacts}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <ContactCard
-                    contact={customer.contacts.primary}
-                    role={dict.contact.primary}
-                    dict={dict}
-                    onCall={handleCallClick}
-                  />
-                  {customer.contacts.ordering && (
-                    <ContactCard
-                      contact={customer.contacts.ordering}
-                      role={dict.contact.ordering}
-                      dict={dict}
-                      onCall={handleCallClick}
-                    />
-                  )}
-                  {customer.contacts.accounting && (
-                    <ContactCard
-                      contact={customer.contacts.accounting}
-                      role={dict.contact.accounting}
-                      dict={dict}
-                      onCall={handleCallClick}
-                    />
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Activity Log */}
-              <ActivityLog
-                customerId={customerId}
+            isEditing ? (
+              <CustomerForm
                 dict={dict}
-                refreshKey={refreshKey}
+                initialData={customer}
+                onSubmit={handleEditSubmit}
+                onCancel={() => setIsEditing(false)}
+                isLoading={isSaving}
               />
-            </>
+            ) : (
+              <>
+                {/* Basic Info */}
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base flex items-center gap-2">
+                      📋 {dict.customer.info}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">{dict.customer.code}</span>
+                      <span>{customer.shortCode} ({customer.peakCode})</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">{dict.customer.type}</span>
+                      <span>{dict.customer.businessTypes[customer.businessType]}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-muted-foreground">{dict.customer.grade}</span>
+                      <span>{gradeEmojis[customer.grade]} {dict.customer.grades[customer.grade]}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-muted-foreground">{dict.customer.status}</span>
+                      <Badge variant={customer.status === "active" ? "default" : "outline"}>
+                        {dict.customer.statuses[customer.status]}
+                      </Badge>
+                    </div>
+                    {customer.note && (
+                      <div className="pt-2 border-t">
+                        <span className="text-muted-foreground">메모: </span>
+                        <span>{customer.note}</span>
+                      </div>
+                    )}
+                    {customer.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1 pt-2">
+                        {customer.tags.map((tag) => (
+                          <Badge key={tag} variant="secondary" className="text-xs">
+                            {tag}
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* Contacts */}
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base flex items-center gap-2">
+                      📞 {dict.customer.contacts}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <ContactCard
+                      contact={customer.contacts.primary}
+                      role={dict.contact.primary}
+                      dict={dict}
+                      onCall={handleCallClick}
+                    />
+                    {customer.contacts.ordering && (
+                      <ContactCard
+                        contact={customer.contacts.ordering}
+                        role={dict.contact.ordering}
+                        dict={dict}
+                        onCall={handleCallClick}
+                      />
+                    )}
+                    {customer.contacts.accounting && (
+                      <ContactCard
+                        contact={customer.contacts.accounting}
+                        role={dict.contact.accounting}
+                        dict={dict}
+                        onCall={handleCallClick}
+                      />
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* Activity Log */}
+                <ActivityLog
+                  customerId={customerId}
+                  dict={dict}
+                  refreshKey={refreshKey}
+                />
+              </>
+            )
           ) : null}
         </main>
 

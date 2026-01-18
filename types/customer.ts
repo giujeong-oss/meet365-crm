@@ -51,6 +51,6 @@ export interface Activity {
   createdAt: Timestamp;
 }
 
-// For creating new documents (without server timestamps)
-export type CustomerInput = Omit<Customer, "createdAt" | "updatedAt">;
-export type ActivityInput = Omit<Activity, "id" | "createdAt">;
+// For creating new documents (without server timestamps and audit fields)
+export type CustomerInput = Omit<Customer, "createdAt" | "updatedAt" | "createdBy" | "updatedBy">;
+export type ActivityInput = Omit<Activity, "id" | "createdAt" | "createdBy">;
