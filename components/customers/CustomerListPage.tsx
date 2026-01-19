@@ -79,29 +79,37 @@ export function CustomerListPage({ dict, lang }: CustomerListPageProps) {
           </div>
         ) : error ? (
           <div className="text-center py-12 text-red-600">{error}</div>
-        ) : customers.length === 0 ? (
-          <div className="text-center py-12 space-y-4">
-            <p className="text-muted-foreground">{dict.common.noData}</p>
-            <Button onClick={handleSeedData} disabled={seeding} variant="outline">
-              {seeding ? (
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
-              ) : (
-                <Database className="h-4 w-4 mr-2" />
-              )}
-              테스트 데이터 추가
-            </Button>
-          </div>
         ) : (
-          <div className="space-y-3 mt-4">
-            {customers.map((customer) => (
-              <CustomerCard
-                key={customer.customerId}
-                customer={customer}
-                dict={dict}
-                lang={lang}
-              />
-            ))}
-          </div>
+          <>
+            {/* Seed Data Button - Always visible */}
+            <div className="flex justify-end mt-4">
+              <Button onClick={handleSeedData} disabled={seeding} variant="outline" size="sm">
+                {seeding ? (
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                ) : (
+                  <Database className="h-4 w-4 mr-2" />
+                )}
+                테스트 데이터 추가
+              </Button>
+            </div>
+
+            {customers.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-muted-foreground">{dict.common.noData}</p>
+              </div>
+            ) : (
+              <div className="space-y-3 mt-4">
+                {customers.map((customer) => (
+                  <CustomerCard
+                    key={customer.customerId}
+                    customer={customer}
+                    dict={dict}
+                    lang={lang}
+                  />
+                ))}
+              </div>
+            )}
+          </>
         )}
 
         {/* Floating Action Button */}
